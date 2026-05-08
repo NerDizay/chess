@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+environs
+tortoise-orm
+aerich
+asyncpg
