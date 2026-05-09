@@ -8,13 +8,15 @@ from backend.auth.cookie import clear_token_cookie, jwt_max_age_seconds, set_tok
 from backend.websocket import run_api_websocket
 from backend.auth.google import get_oauth_client
 from backend.database import close_database, init_database
-from backend.exceptions import UserNotFoundError
-from fastapi import APIRouter, FastAPI, HTTPException, Request, WebSocket
+from backend.auth.dependencies import JwtIdentity, require_jwt_identity
+from backend.exceptions import GameForbiddenError, GameNotFoundError, UserNotFoundError
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, WebSocket
 from starlette.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from starlette.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from backend.repositories import GameDB, UserRepository, purge_expired_anonymous_users
+from backend.repositories import GameDB, QueueWhoWantPlayRepository, UserRepository, purge_expired_anonymous_users
 from backend.services import GameService, UserService
+from backend.websocket.registry import ws_registry
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -26,7 +28,9 @@ api_router = APIRouter(prefix=API_PREFIX)
 
 user_repository = UserRepository()
 user_svc = UserService(user_repository)
-game_service = GameService(GameDB(), user_svc)
+game_db = GameDB()
+queue_repo = QueueWhoWantPlayRepository(game_db)
+game_service = GameService(game_db, user_svc)
 
 
 @asynccontextmanager
@@ -61,8 +65,49 @@ async def healthcheck() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@api_router.get("/matchmaking/waiting")
+async def http_matchmaking_waiting(
+    ident: JwtIdentity = Depends(require_jwt_identity),
+) -> dict[str, int]:
+    """Сколько других пользователей в очереди (сам запросивший не учитывается)."""
+    n = await queue_repo.count_others_waiting(ident.user_id)
+    return {"waiting_count": n}
+
+
 class AnonymousAuthBody(BaseModel):
     name: str | None = Field(default=None, max_length=30)
+
+
+class GamesSyncHttpBody(BaseModel):
+    game_id: int
+    client_version: int | None = None
+    battle_field: dict[str, object] | None = None
+
+
+@api_router.get("/games/active")
+async def http_games_active(ident: JwtIdentity = Depends(require_jwt_identity)) -> dict[str, object | None]:
+    """Текущая парная партия (для восстановления после F5 без полного тела WS)."""
+    g = await game_service.active_game_dict(ident.user_id)
+    return {"game": g}
+
+
+@api_router.post("/games/sync")
+async def http_games_sync(
+    body: GamesSyncHttpBody,
+    ident: JwtIdentity = Depends(require_jwt_identity),
+) -> dict[str, object]:
+    """Дельта позиции относительно кэша клиента (IndexedDB)."""
+    try:
+        return await game_service.sync_game(
+            body.game_id,
+            ident.user_id,
+            body.client_version,
+            body.battle_field,
+        )
+    except GameNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    except GameForbiddenError as e:
+        raise HTTPException(status_code=403, detail=str(e)) from e
 
 
 @api_router.post("/auth/anonymous")
@@ -145,7 +190,7 @@ async def auth_logout() -> JSONResponse:
 
 @api_router.websocket("/ws")
 async def api_websocket(websocket: WebSocket) -> None:
-    await run_api_websocket(websocket, game_service)
+    await run_api_websocket(websocket, game_service, queue_repo, ws_registry)
 
 
 app.include_router(api_router)

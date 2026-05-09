@@ -8,9 +8,12 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any
 
+from backend.repositories import QueueWhoWantPlayRepository
 from backend.services import GameService
 
 from backend.auth.dependencies import JwtIdentity
+
+from .registry import WsRegistry
 
 HandlerFn = Callable[..., Awaitable[Any]]
 
@@ -21,6 +24,8 @@ _REGISTRY: dict[str, HandlerFn] = {}
 class HandlerContext:
     connection_user: JwtIdentity | None
     game_service: GameService
+    queue_repo: QueueWhoWantPlayRepository
+    ws_registry: WsRegistry
 
 
 class HandlerError(Exception):
@@ -59,6 +64,8 @@ async def execute_handler(
     msg: Any,
     connection_user: JwtIdentity | None,
     game_service: GameService,
+    queue_repo: QueueWhoWantPlayRepository,
+    ws_registry: WsRegistry,
 ) -> dict[str, Any]:
     """Вызывает зарегистрированный хэндлер по `msg.action`; собирает ответ запрос/ответ."""
     action = getattr(msg, "action", None)
@@ -82,6 +89,8 @@ async def execute_handler(
     ctx = HandlerContext(
         connection_user=connection_user,
         game_service=game_service,
+        queue_repo=queue_repo,
+        ws_registry=ws_registry,
     )
     mid = msg.id
     try:

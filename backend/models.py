@@ -14,8 +14,23 @@ class User(Model):
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
-    class Meta:
+    class Meta:  # pyright: ignore[reportIncompatibleVariableOverride]
         table = "users"
+
+
+class QueueWhoWantPlay(Model):
+    """Очередь игроков, ожидающих соперника для автоподбора."""
+
+    user = fields.ForeignKeyField(
+        "models.User",
+        related_name="queue_who_want_play_entry",
+        on_delete=fields.CASCADE,
+        unique=True,
+    )
+    created_at = fields.DatetimeField(auto_now_add=True)
+
+    class Meta:  # pyright: ignore[reportIncompatibleVariableOverride]
+        table = "queue_who_want_play"
 
 
 class Game(Model):
@@ -33,9 +48,13 @@ class Game(Model):
         null=True,
     )
     whose_move = fields.CharField(max_length=5)
+    """После мата: ``white`` или ``black`` — кто выиграл; иначе ``None``."""
+    winner_side = fields.CharField(max_length=5, null=True)
     battle_field = fields.JSONField()
+    # Монотонно растёт при каждом сохранении позиции (клиент: дельта / IndexedDB).
+    state_version = fields.IntField(default=1)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
-    class Meta:
+    class Meta:  # pyright: ignore[reportIncompatibleVariableOverride]
         table = "games"

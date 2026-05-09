@@ -7,7 +7,4 @@ readme = "../README.md"
 [tool.pyright]
 pythonVersion = "3.14"
 
-[tool.aerich]
-tortoise_orm = "backend.database.TORTOISE_ORM"
-location = "../migrations"
-src_folder = ".."
+# Aerich: см. корневой pyproject.toml и каталог migrations/

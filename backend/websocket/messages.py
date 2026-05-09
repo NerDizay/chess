@@ -9,6 +9,13 @@ __all__ = [
     "AuthMeIn",
     "GamesCreateIn",
     "GamesGetIn",
+    "MatchmakingPlayIn",
+    "MatchmakingCancelIn",
+    "GamesAbandonIn",
+    "GamesMoveIn",
+    "GamesActiveIn",
+    "GamesSyncIn",
+    "GamesLegalMovesIn",
     "Msg",
     "Inbound",
     "parse_inbound",
@@ -45,10 +52,92 @@ class GamesGetIn(BaseModel):
     game_id: int
 
 
-Msg = Union[PingIn, AuthMeIn, GamesCreateIn, GamesGetIn]
+class MatchmakingPlayIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str | int
+    action: Literal["matchmaking.play"]
+
+
+class MatchmakingCancelIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str | int
+    action: Literal["matchmaking.cancel"]
+
+
+class GamesAbandonIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str | int
+    action: Literal["games.abandon"]
+    game_id: int
+
+
+class GamesMoveIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str | int
+    action: Literal["games.move"]
+    game_id: int
+    from_cell: str
+    to_cell: str
+
+
+class GamesActiveIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str | int
+    action: Literal["games.active"]
+
+
+class GamesSyncIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str | int
+    action: Literal["games.sync"]
+    game_id: int
+    client_version: int | None = None
+    battle_field: dict[str, Any] | None = None
+
+
+class GamesLegalMovesIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str | int
+    action: Literal["games.legal_moves"]
+    game_id: int
+    from_cell: str
+
+
+Msg = Union[
+    PingIn,
+    AuthMeIn,
+    GamesCreateIn,
+    GamesGetIn,
+    MatchmakingPlayIn,
+    MatchmakingCancelIn,
+    GamesAbandonIn,
+    GamesMoveIn,
+    GamesActiveIn,
+    GamesSyncIn,
+    GamesLegalMovesIn,
+]
 
 Inbound = Annotated[
-    Union[PingIn, AuthMeIn, GamesCreateIn, GamesGetIn],
+    Union[
+        PingIn,
+        AuthMeIn,
+        GamesCreateIn,
+        GamesGetIn,
+        MatchmakingPlayIn,
+        MatchmakingCancelIn,
+        GamesAbandonIn,
+        GamesMoveIn,
+        GamesActiveIn,
+        GamesSyncIn,
+        GamesLegalMovesIn,
+    ],
     Field(discriminator="action"),
 ]
 

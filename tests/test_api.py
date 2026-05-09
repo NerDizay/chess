@@ -82,3 +82,43 @@ def test_auth_me_unauthorized(client: TestClient):
         msg = ws.receive_json()
         assert msg["ok"] is False
         assert msg["error"]["code"] == 401
+
+
+def test_matchmaking_pair_two_clients():
+    """Один «Играть» → waiting; второй на другой сессии → matched; первый получает push."""
+    with TestClient(app) as c1, TestClient(app) as c2:
+        assert c1.post(f"{API_PREFIX}/auth/anonymous", json={"name": "alpha"}).status_code == 200
+        assert c2.post(f"{API_PREFIX}/auth/anonymous", json={"name": "beta"}).status_code == 200
+        with (
+            c1.websocket_connect(f"{API_PREFIX}/ws") as w1,
+            c2.websocket_connect(f"{API_PREFIX}/ws") as w2,
+        ):
+            w1.send_json({"id": "p1", "action": "matchmaking.play"})
+            r1 = w1.receive_json()
+            assert r1["ok"] is True
+            assert r1["data"]["status"] == "waiting"
+            assert "queued_at" in r1["data"]
+
+            w2.send_json({"id": "p2", "action": "matchmaking.play"})
+            r2 = w2.receive_json()
+            assert r2["ok"] is True
+            assert r2["data"]["status"] == "matched"
+            assert r2["data"]["game"]["white_user"]["name"] == "alpha"
+            assert r2["data"]["game"]["black_user"]["name"] == "beta"
+
+            push = w1.receive_json()
+            assert push.get("type") == "push"
+            assert push.get("event") == "matchmaking.matched"
+            assert push["data"]["game"]["id"] == r2["data"]["game"]["id"]
+
+
+def test_matchmaking_cancel(client: TestClient):
+    client.post(f"{API_PREFIX}/auth/anonymous", json={"name": "solo"})
+    with client.websocket_connect(f"{API_PREFIX}/ws") as ws:
+        ws.send_json({"id": "m1", "action": "matchmaking.play"})
+        r = ws.receive_json()
+        assert r["data"]["status"] == "waiting"
+        ws.send_json({"id": "m2", "action": "matchmaking.cancel"})
+        r2 = ws.receive_json()
+        assert r2["ok"] is True
+        assert r2["data"]["status"] == "cancelled"

@@ -44,6 +44,21 @@ class UserNotFoundError(ChessError):
         super().__init__(f"User with id {user_id} not found.")
 
 
+class GameNotFoundError(ChessError):
+    def __init__(self, game_id: int) -> None:
+        super().__init__(f"Game with id {game_id} not found.")
+
+
+class GameForbiddenError(ChessError):
+    def __init__(self) -> None:
+        super().__init__("Not a participant of this game.")
+
+
+class InvalidMoveError(ChessError):
+    def __init__(self, message: str = "Illegal move.") -> None:
+        super().__init__(message)
+
+
 class InvalidGameUserAssignmentError(ChessError):
     def __init__(self, expected_team: str, actual_team: str, role: str) -> None:
         message = (

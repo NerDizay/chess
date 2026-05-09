@@ -1,11 +1,15 @@
 from dataclasses import dataclass
-from typing import Literal
+from enum import StrEnum
 
 from backend.exceptions import InvalidTeamError, InvalidUserNameError
 
 
 MAX_USER_NAME_LENGTH = 30
-Team = Literal["black", "white"]
+
+
+class Team(StrEnum):
+    WHITE = "white"
+    BLACK = "black"
 
 
 @dataclass
@@ -17,8 +21,11 @@ class User:
     def __post_init__(self) -> None:
         if not self.name or len(self.name) > MAX_USER_NAME_LENGTH:
             raise InvalidUserNameError(name=self.name, max_length=MAX_USER_NAME_LENGTH)
-        if self.team not in ("black", "white"):
-            raise InvalidTeamError(team=self.team)
+        try:
+            team = Team(self.team)
+        except ValueError:
+            raise InvalidTeamError(team=str(self.team)) from None
+        object.__setattr__(self, "team", team)
 
     def serialize(self) -> dict[str, str]:
         data = {"name": self.name, "team": self.team}

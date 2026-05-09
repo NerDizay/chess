@@ -56,7 +56,7 @@ function googleLogin() {
 
       <div class="divider">или</div>
 
-      <button type="button" class="btn google" :disabled="loading" @click="googleLogin">
+      <button type="button" class="btn google" disabled @click="googleLogin">
         Войти через Google
       </button>
 
@@ -67,19 +67,22 @@ function googleLogin() {
 
 <style scoped>
 .login {
+  min-height: 100dvh;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: clamp(0.65rem, 4vw, 1.5rem);
+  padding-bottom: max(clamp(0.65rem, 4vw, 1.5rem), env(safe-area-inset-bottom, 0px));
+  padding-top: max(clamp(0.65rem, 4vw, 1.5rem), env(safe-area-inset-top, 0px));
   background: radial-gradient(ellipse at top, #2a3142 0%, #151821 55%);
 }
 
 .card {
   width: 100%;
   max-width: 22rem;
-  padding: 2rem;
-  border-radius: 12px;
+  padding: clamp(1rem, 5vw, 2rem);
+  border-radius: clamp(10px, 2vw, 12px);
   background: #1e2430;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -87,7 +90,7 @@ function googleLogin() {
 
 .title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: clamp(1.35rem, 6vw, 1.75rem);
   font-weight: 650;
   letter-spacing: -0.02em;
   color: #f0f2f7;

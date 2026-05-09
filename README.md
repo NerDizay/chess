@@ -39,7 +39,12 @@ DATABASE_URL=sqlite://./chess.db
 DB_GENERATE_SCHEMAS=true
 ```
 
-Для PostgreSQL укажи свой URL в `DATABASE_URL` и применяй миграции через Aerich (`aerich init-db`, `aerich migrate` и т.д.), если они уже настроены в проекте.
+Для PostgreSQL укажи свой URL в `DATABASE_URL`. Миграции Aerich лежат в **`migrations/models/`**, конфиг — **`pyproject.toml`** в корне репозитория. При старте API вызывается `aerich upgrade` (через `Command` в `backend/database.py`). Локально, после изменения моделей: из корня проекта, с тем же `DATABASE_URL`, что в `.env`:
+
+```bash
+aerich migrate --name описание_изменения
+aerich upgrade
+```
 
 5. Запусти сервер:
 
@@ -85,6 +90,12 @@ npm run dev
 Открывай [http://127.0.0.1:5173](http://127.0.0.1:5173) — Vite проксирует запросы с префиксом **`/api`** на бэкенд (см. `frontend/vite.config.js`). Запросы к статике и модулям Vite обслуживает сам dev-сервер.
 
 Интерфейс — один адрес **`/`** (без **`#`** в URL и без **vue-router**): корневой **`App.vue`** подставляет нужное представление из **`frontend/src/views/`** (вход / игра) по состоянию и cookie.
+
+### SVG-фигуры на доске
+
+Графика фигур лежит в **`frontend/public/`** и раздаётся Vite как статика с корня сайта. Имена файлов совпадают с типом и цветом фигуры из API: **`{white|black}_{king|queen|rook|bishop|knight|pawn}.svg`** (например `white_king.svg`, `black_pawn.svg`). В коде доски URL собирается в **`frontend/src/components/ChessBoard.vue`** в функции **`pieceSvgSrc`** как **`/${color}_${name}.svg`**.
+
+Если перенесёшь SVG в подпапку (например **`frontend/public/pieces/`**), измени префикс в **`pieceSvgSrc`** на путь вида **`/pieces/${color}_${piece.name}.svg`** (и положи файлы в `public/pieces/` с теми же именами).
 
 Каталог **`static/`** — результат `npm run build`; в **`.gitignore`** он исключён (билд получают локально или в Docker при сборке образа).
 

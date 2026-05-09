@@ -31,7 +31,7 @@ class Piece:
             result.extend(directional_moves(cell, move, self.max_step))
         return result
 
-    def serialize(self) -> dict[str, str | int | list[str]]:
+    def serialize(self) -> dict[str, object]:
         return {
             "color": self.color,
             "name": self.name,
@@ -73,7 +73,7 @@ class Knight(Piece):
     def get_possible_moves(self, cell: Cell) -> list[Cell]:
         return knight_moves(cell)
 
-    def serialize(self) -> dict[str, str | int | list[str]]:
+    def serialize(self) -> dict[str, object]:
         data = super().serialize()
         data["possible_moves"] = ["knight_moves"]
         return data

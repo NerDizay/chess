@@ -36,9 +36,14 @@ TORTOISE_ORM = get_tortoise_config(_settings.database_url)
 
 
 async def init_database() -> None:
-    await Tortoise.init(config=TORTOISE_ORM)
+    """Схема: Aerich (`migrations/models/`), затем при флаге — доп. таблицы из моделей."""
+    from aerich import Command
+
+    command = Command(tortoise_config=TORTOISE_ORM, app="models", location="migrations")
+    await command.init()
     if _settings.generate_schemas:
         await Tortoise.generate_schemas()
+    await command.upgrade()
 
 
 async def close_database() -> None:

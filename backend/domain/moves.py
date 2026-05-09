@@ -23,6 +23,13 @@ def _to_coords(cell: Cell) -> tuple[int, int]:
     return col_index, row_index
 
 
+def ensure_cell(value: str) -> Cell:
+    """Проверяет нотацию (например e4); иначе InvalidCellError."""
+    c = Cell(value)
+    _to_coords(c)
+    return c
+
+
 def _from_coords(col_index: int, row_index: int) -> Cell | None:
     if not (0 <= col_index < 8 and 0 <= row_index < 8):
         return None
