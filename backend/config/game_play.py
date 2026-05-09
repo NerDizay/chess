@@ -17,7 +17,7 @@ game_play_config = GamePlayConfig()
 # Стартовая позиция новых партий (matchmaking / очередь).
 # Пресеты: MateTrainingBattleField, EnPassantTrainingBattleField, CastleTrainingBattleField
 # в backend/domain/battle_fields.py — импортируйте нужный класс и подставьте сюда одной строкой.
-# START_BATTLE_FIELD_CLASS = battle_fields.DefaultBattleField
+START_BATTLE_FIELD_CLASS = battle_fields.DefaultBattleField
 # START_BATTLE_FIELD_CLASS = battle_fields.MateTrainingBattleField
 # START_BATTLE_FIELD_CLASS = battle_fields.EnPassantTrainingBattleField
-START_BATTLE_FIELD_CLASS = battle_fields.CastleTrainingBattleField
+# START_BATTLE_FIELD_CLASS = battle_fields.CastleTrainingBattleField
