@@ -1,0 +1,13 @@
+[project]
+name = "chess"
+version = "0"
+requires-python = ">=3.14,<3.15"
+readme = "../README.md"
+
+[tool.pyright]
+pythonVersion = "3.14"
+
+[tool.aerich]
+tortoise_orm = "backend.database.TORTOISE_ORM"
+location = "../migrations"
+src_folder = ".."

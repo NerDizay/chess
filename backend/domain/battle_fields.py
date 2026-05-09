@@ -1,5 +1,5 @@
-from domain.moves import Cell
-from domain.pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
+from backend.domain.moves import Cell
+from backend.domain.pieces import Bishop, King, Knight, Pawn, Piece, Queen, Rook
 
 
 class DefaultBattleField:

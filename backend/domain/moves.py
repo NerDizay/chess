@@ -1,6 +1,6 @@
 from typing import Callable, NewType
 
-from exceptions import InvalidCellError, InvalidKnightDeltaError, InvalidStepError
+from backend.exceptions import InvalidCellError, InvalidKnightDeltaError, InvalidStepError
 
 
 MIN_STEP = 1

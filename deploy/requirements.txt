@@ -1,0 +1,12 @@
+fastapi==0.136.1
+uvicorn[standard]==0.34.0
+httpx==0.28.1
+itsdangerous==2.2.0
+environs==14.1.0
+tortoise-orm==0.24.1
+aerich==0.8.1
+asyncpg==0.30.0
+PyJWT==2.10.1
+authlib==1.5.1
+cryptography==45.0.5
+uuid-utils==0.14.1

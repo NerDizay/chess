@@ -1,10 +1,16 @@
 from tortoise import fields
 from tortoise.models import Model
 
+from backend.utils import new_user_uuid
+
 
 class User(Model):
-    id = fields.IntField(pk=True)
+    id = fields.UUIDField(primary_key=True, default=new_user_uuid)
     name = fields.CharField(max_length=30)
+    email = fields.CharField(max_length=255, null=True)
+    google_sub = fields.CharField(max_length=255, null=True, unique=True)
+    is_anonymous = fields.BooleanField(default=False)
+    anonymous_expires_at = fields.DatetimeField(null=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
@@ -13,7 +19,7 @@ class User(Model):
 
 
 class Game(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     white_user = fields.ForeignKeyField(
         "models.User",
         related_name="white_games",

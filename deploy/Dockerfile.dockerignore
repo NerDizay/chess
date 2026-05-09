@@ -1,0 +1,18 @@
+# Игнор для образа web: лежит рядом с deploy/Dockerfile (см. документацию Docker — Dockerfile-specific ignore).
+.git
+.pytest_cache
+__pycache__
+*.py[cod]
+.venv
+venv
+.env
+.env.*
+!.env.example
+frontend/node_modules
+*.egg-info
+.idea
+.vscode
+.cursor
+*.db
+*.sqlite3
+*.log

@@ -24,7 +24,7 @@ def get_tortoise_config(database_url: str) -> dict[str, object]:
         "connections": {"default": database_url},
         "apps": {
             "models": {
-                "models": ["models", "aerich.models"],
+                "models": ["backend.models", "aerich.models"],
                 "default_connection": "default",
             }
         },

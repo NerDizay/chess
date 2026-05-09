@@ -39,6 +39,11 @@ class InvalidUserNameError(ChessError):
         super().__init__(message)
 
 
+class UserNotFoundError(ChessError):
+    def __init__(self, user_id: str | int) -> None:
+        super().__init__(f"User with id {user_id} not found.")
+
+
 class InvalidGameUserAssignmentError(ChessError):
     def __init__(self, expected_team: str, actual_team: str, role: str) -> None:
         message = (

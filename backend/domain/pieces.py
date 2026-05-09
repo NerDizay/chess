@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Callable
 
-from domain.moves import (
+from backend.domain.moves import (
     Cell,
     directional_moves,
     down,

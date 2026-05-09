@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Protocol
 
-from domain.user import Team, User
-from exceptions import InvalidGameUserAssignmentError
+from backend.domain.user import Team, User
+from backend.exceptions import InvalidGameUserAssignmentError
 
 
 class BattleFieldLike(Protocol):
