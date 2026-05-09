@@ -195,10 +195,6 @@ async def api_websocket(websocket: WebSocket) -> None:
 
 app.include_router(api_router)
 
-_assets_dir = STATIC_DIR / "assets"
-if _assets_dir.is_dir():
-    app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
-
 
 @app.get("/", response_model=None)
 async def root_page():
@@ -207,3 +203,8 @@ async def root_page():
     if built.is_file():
         return FileResponse(built)
     return HTMLResponse("", status_code=503)
+
+
+# После API и точного GET `/`: файлы из `static/` (JS/CSS в `static/assets/`, SVG из `public/` в корне билда).
+if STATIC_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=False), name="static")

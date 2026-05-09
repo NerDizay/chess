@@ -1,7 +1,14 @@
 # Инструкции для агента
 
 - Интерпретатор: **Python 3.14.0**; после активации venv команды запускать через **`python`** (не `python3`), см. [README — раздел «Запуск API»](./README.md#запуск-api) и подраздел [«Какие команды считать эталоном»](./README.md#какие-команды-считать-эталоном).
-- Активация виртуального окружения (`pyenv activate chess_venv` и т.д.) описана там же: [README — «Запуск API»](./README.md#запуск-api).
+- **Активация pyenv-окружения `chess_venv` в каждой новой сессии терминала** (порядок важен):
+
+  ```bash
+  source ~/.pyenv/activate
+  pyenv activate chess_venv
+  ```
+
+  Один раз создать окружение: `pyenv virtualenv 3.14.0 chess_venv` (после `source ~/.pyenv/activate`). Подробности и установка зависимостей — в [README — «Запуск API»](./README.md#запуск-api).
 
 ## Типизация (Pyright / basedpyright)
 
